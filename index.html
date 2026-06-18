@@ -392,47 +392,6 @@ tbody td{padding:8px 12px;color:var(--ink2);border-bottom:1px solid var(--border
   <!-- KPI HIỆU SUẤT -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;" id="dt-kpi-row"></div>
 
-  <!-- SO SÁNH ĐỘI -->
-  <div class="sec-title">SO SÁNH HIỆU SUẤT GIỮA CÁC ĐỘI</div>
-  <div class="g3" style="margin-bottom:18px;">
-    <!-- Bar ngang % TH theo Đội -->
-    <div class="card">
-      <div class="card-hdr"><div class="card-title">% Hoàn Thành Theo Đội</div><div class="card-sub">DT thực hiện / DT kế hoạch</div></div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:200px"><canvas id="barDoiPct"></canvas></div>
-      </div>
-    </div>
-    <!-- Bar DT tuyệt đối KH vs TH -->
-    <div class="card">
-      <div class="card-hdr"><div class="card-title">DT KH vs TH Theo Đội (ha)</div><div class="card-sub">Diện tích tuyệt đối</div></div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:200px"><canvas id="barDoiHa"></canvas></div>
-        <div class="legend" style="margin-top:8px">
-          <div class="leg-item"><div class="leg-dot" style="background:var(--g1)"></div>KH</div>
-          <div class="leg-item"><div class="leg-dot" style="background:var(--g3)"></div>TH</div>
-        </div>
-      </div>
-    </div>
-    <!-- Radar hiệu suất 3 Đội -->
-    <div class="card">
-      <div class="card-hdr"><div class="card-title">Radar Hiệu Suất 3 Đội</div><div class="card-sub">Đa góc nhìn: %TH, lô HT, tốc độ</div></div>
-      <div class="card-body">
-        <div class="chart-wrap" style="height:200px"><canvas id="radarDoi"></canvas></div>
-        <div class="legend" style="margin-top:4px;justify-content:center;flex-wrap:wrap;">
-          <div class="leg-item"><div class="leg-dot" style="background:#1B4332"></div>Đội 1</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#52B788"></div>Đội 2</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#E9A825"></div>Đội 3</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TIẾN ĐỘ TỪNG ĐỘI CHI TIẾT -->
-  <div class="sec-title">TIẾN ĐỘ THỰC HIỆN TỪNG ĐỘI</div>
-  <div class="g3" style="margin-bottom:18px;" id="doi-cards-row">
-    <!-- auto-rendered by JS -->
-  </div>
-
   <!-- SO SÁNH TỔ & ĐỘI — driven by unified filter bar -->
   <div class="sec-title">SO SÁNH HIỆU SUẤT: ĐỘI & TỔ</div>
 

@@ -924,54 +924,6 @@ function renderDtKPI(data, d1, d2, d3){
   `;
 }
 
-function renderDoiCards(d1,d2,d3){
-  const el=document.getElementById('doi-cards-row');
-  el.innerHTML='';
-  [d1,d2,d3].forEach((d,idx)=>{
-    const colors=['#1B4332','#2D6A4F','#52B788'];
-    const pct=d.pctTH;
-    const fc=pct>=80?'fill-g':pct>=50?'fill-a':'fill-r';
-    const rank=idx+1;
-    el.innerHTML+=`
-    <div class="card">
-      <div class="card-hdr" style="background:${colors[idx]}10;border-left:4px solid ${colors[idx]};">
-        <div>
-          <div class="card-title" style="color:${colors[idx]}">${d.doiName}</div>
-          <div class="card-sub">${d.rows.length} lô · ${d.dtKH.toFixed(1)} ha kế hoạch</div>
-        </div>
-        <div style="font-size:22px;font-weight:800;color:${colors[idx]}">${pct.toFixed(0)}%</div>
-      </div>
-      <div class="card-body">
-        <div class="prog-track" style="height:10px;margin-bottom:14px">
-          <div class="prog-fill ${fc}" style="width:${Math.min(pct,100)}%"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
-          <div style="background:#F0FFF4;border-radius:8px;padding:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--g2)">${d.done}</div>
-            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Hoàn thành</div>
-          </div>
-          <div style="background:#FFFBEB;border-radius:8px;padding:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--amber)">${d.partial}</div>
-            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Đang TH</div>
-          </div>
-          <div style="background:#FFF1F2;border-radius:8px;padding:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--red)">${d.pending}</div>
-            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Chưa TH</div>
-          </div>
-        </div>
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
-          <span style="font-size:11px;color:var(--ink3)">DT đã TH:</span>
-          <span style="font-size:12px;font-weight:700;color:var(--g1)">${d.dtTH.toFixed(1)} / ${d.dtKH.toFixed(1)} ha</span>
-        </div>
-        <div style="margin-top:6px;display:flex;justify-content:space-between;">
-          <span style="font-size:11px;color:var(--ink3)">Còn lại:</span>
-          <span style="font-size:12px;font-weight:700;color:var(--red)">${(d.dtKH-d.dtTH).toFixed(1)} ha</span>
-        </div>
-      </div>
-    </div>`;
-  });
-}
-
 function renderTopTables(data){
   // Top done — sort by dt desc
   const doneRows=data.filter(r=>statusOf(r)==='done').sort((a,b)=>b.dt-a.dt).slice(0,8);
@@ -1040,63 +992,7 @@ function renderDetailTable(data){
 }
 
 function renderDetailCharts(data, d1, d2, d3){
-  const DOIS=['Đội 1','Đội 2','Đội 3'];
-  const DCOLS=['#1B4332','#52B788','#E9A825'];
-  const DBGS=['rgba(27,67,50,.8)','rgba(82,183,136,.8)','rgba(233,168,37,.8)'];
-
-  // 1. Bar % TH theo Đội (horizontal)
-  destroyChart('barDoiPct');
-  chartInstances['barDoiPct']=new Chart(document.getElementById('barDoiPct'),{
-    type:'bar',
-    data:{
-      labels:DOIS,
-      datasets:[{
-        label:'% Hoàn thành',
-        data:[d1.pctTH,d2.pctTH,d3.pctTH],
-        backgroundColor:DBGS,
-        borderRadius:6,
-      }]
-    },
-    options:{
-      indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.toFixed(1)}%`}}},
-      scales:{x:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'#F3F4F6'}},y:{grid:{display:false}}},
-    }
-  });
-
-  // 2. Bar DT ha
-  destroyChart('barDoiHa');
-  chartInstances['barDoiHa']=new Chart(document.getElementById('barDoiHa'),{
-    type:'bar',
-    data:{
-      labels:DOIS,
-      datasets:[
-        {label:'KH (ha)',data:[d1.dtKH,d2.dtKH,d3.dtKH],backgroundColor:'#1B4332',borderRadius:4},
-        {label:'TH (ha)',data:[d1.dtTH,d2.dtTH,d3.dtTH],backgroundColor:'#52B788',borderRadius:4},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{callback:v=>v+' ha'}}}}
-  });
-
-  // 3. Radar đa chỉ số 3 Đội
-  const maxPct=100, maxLo=Math.max(d1.rows.length,d2.rows.length,d3.rows.length)||1;
-  const maxDt=Math.max(d1.dtKH,d2.dtKH,d3.dtKH)||1;
-  function norm(v,max){return max>0?v/max*100:0;}
-  destroyChart('radarDoi');
-  chartInstances['radarDoi']=new Chart(document.getElementById('radarDoi'),{
-    type:'radar',
-    data:{
-      labels:['% Hoàn thành','Lô HT','Tốc độ TH','DT phủ','Tỉ lệ lô'],
-      datasets:[
-        {label:'Đội 1',data:[norm(d1.pctTH,100),norm(d1.done,maxLo),norm(d1.dtTH,maxDt),norm(d1.dtKH,maxDt),norm(d1.done,d1.rows.length||1)],backgroundColor:'rgba(27,67,50,.15)',borderColor:'#1B4332',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1B4332'},
-        {label:'Đội 2',data:[norm(d2.pctTH,100),norm(d2.done,maxLo),norm(d2.dtTH,maxDt),norm(d2.dtKH,maxDt),norm(d2.done,d2.rows.length||1)],backgroundColor:'rgba(82,183,136,.15)',borderColor:'#52B788',borderWidth:2,pointRadius:3,pointBackgroundColor:'#52B788'},
-        {label:'Đội 3',data:[norm(d3.pctTH,100),norm(d3.done,maxLo),norm(d3.dtTH,maxDt),norm(d3.dtKH,maxDt),norm(d3.done,d3.rows.length||1)],backgroundColor:'rgba(233,168,37,.15)',borderColor:'#E9A825',borderWidth:2,pointRadius:3,pointBackgroundColor:'#E9A825'},
-      ]
-    },
-    options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:8}},pointLabels:{font:{size:9}}}},plugins:{legend:{display:false}}}
-  });
-
-  // 4. Scatter — đẹp hơn: bubble size = DT, màu theo Đội, tooltip rõ
+  // Scatter — đẹp hơn: bubble size = DT, màu theo Đội, tooltip rõ
   const DOIS_SC = ['Đội 1','Đội 2','Đội 3'];
   const SC_COLORS = ['#1B4332','#52B788','#E9A825'];
   const SC_BORDERS= ['#1B4332','#2D6A4F','#B07D10'];
@@ -1255,7 +1151,6 @@ function masterFilter(){
 
   // 6. Render all sections
   renderDtKPI(baseForDoi, d1, d2, d3);
-  renderDoiCards(d1, d2, d3);
   renderTopTables(baseForDoi);
   renderDetailTable(baseData);
   renderDetailCharts(baseForDoi, d1, d2, d3);

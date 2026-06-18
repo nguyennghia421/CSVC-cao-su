@@ -924,6 +924,55 @@ function renderDtKPI(data, d1, d2, d3){
   `;
 }
 
+function renderDoiCards(d1,d2,d3){
+  const el=document.getElementById('doi-cards-row');
+  if(!el) return; // element removed
+  el.innerHTML='';
+  [d1,d2,d3].forEach((d,idx)=>{
+    const colors=['#1B4332','#2D6A4F','#52B788'];
+    const pct=d.pctTH;
+    const fc=pct>=80?'fill-g':pct>=50?'fill-a':'fill-r';
+    const rank=idx+1;
+    el.innerHTML+=`
+    <div class="card">
+      <div class="card-hdr" style="background:${colors[idx]}10;border-left:4px solid ${colors[idx]};">
+        <div>
+          <div class="card-title" style="color:${colors[idx]}">${d.doiName}</div>
+          <div class="card-sub">${d.rows.length} lô · ${d.dtKH.toFixed(1)} ha kế hoạch</div>
+        </div>
+        <div style="font-size:22px;font-weight:800;color:${colors[idx]}">${pct.toFixed(0)}%</div>
+      </div>
+      <div class="card-body">
+        <div class="prog-track" style="height:10px;margin-bottom:14px">
+          <div class="prog-fill ${fc}" style="width:${Math.min(pct,100)}%"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+          <div style="background:#F0FFF4;border-radius:8px;padding:8px;">
+            <div style="font-size:18px;font-weight:700;color:var(--g2)">${d.done}</div>
+            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Hoàn thành</div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:8px;padding:8px;">
+            <div style="font-size:18px;font-weight:700;color:var(--amber)">${d.partial}</div>
+            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Đang TH</div>
+          </div>
+          <div style="background:#FFF1F2;border-radius:8px;padding:8px;">
+            <div style="font-size:18px;font-weight:700;color:var(--red)">${d.pending}</div>
+            <div style="font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">Chưa TH</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
+          <span style="font-size:11px;color:var(--ink3)">DT đã TH:</span>
+          <span style="font-size:12px;font-weight:700;color:var(--g1)">${d.dtTH.toFixed(1)} / ${d.dtKH.toFixed(1)} ha</span>
+        </div>
+        <div style="margin-top:6px;display:flex;justify-content:space-between;">
+          <span style="font-size:11px;color:var(--ink3)">Còn lại:</span>
+          <span style="font-size:12px;font-weight:700;color:var(--red)">${(d.dtKH-d.dtTH).toFixed(1)} ha</span>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
 function renderTopTables(data){
   // Top done — sort by dt desc
   const doneRows=data.filter(r=>statusOf(r)==='done').sort((a,b)=>b.dt-a.dt).slice(0,8);
@@ -991,8 +1040,7 @@ function renderDetailTable(data){
   });
 }
 
-function renderDetailCharts(data, d1, d2, d3){
-  // Scatter — đẹp hơn: bubble size = DT, màu theo Đội, tooltip rõ
+function renderScatterChart(data){
   const DOIS_SC = ['Đội 1','Đội 2','Đội 3'];
   const SC_COLORS = ['#1B4332','#52B788','#E9A825'];
   const SC_BORDERS= ['#1B4332','#2D6A4F','#B07D10'];
@@ -1052,8 +1100,10 @@ function renderDetailCharts(data, d1, d2, d3){
       }
     }
   });
+}
 
-  // 5. Line chart luỹ kế toàn CT — full width
+function renderLineChart(){
+  // Line chart luỹ kế toàn CT — full width
   const labels=['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
   const khCumData=[393,786,1179,1965,2750,3536,3929,4320,4500,4650,4713,4713];
   const thCumData=[301,680,1100,1820,2400,2800,3022,null,null,null,null,null];
@@ -1153,7 +1203,7 @@ function masterFilter(){
   renderDtKPI(baseForDoi, d1, d2, d3);
   renderTopTables(baseForDoi);
   renderDetailTable(baseData);
-  renderDetailCharts(baseForDoi, d1, d2, d3);
+  renderScatterChart(baseForDoi);
 
   // 7. Slicer section — compare based on doi+to selection
   renderSlicerSection(doi, to, baseForDoi);
@@ -1383,6 +1433,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   buildTQCharts();
   renderProgBars();
   renderTongHop();
+  renderLineChart();
 });
 </script>
 </body>
